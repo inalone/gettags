@@ -6,4 +6,4 @@ impl TagRead for FlacTags {}
 
 impl TagWrite for FlacTags {}
 
-impl Tags for FlacTags {}
+impl_tags!(FlacTags);
