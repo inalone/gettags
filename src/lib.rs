@@ -15,9 +15,10 @@ fn string_from_os_str(
     file_name: Option<&String>,
 ) -> Result<String, GetTagsError> {
     let generate_error = |message_format: &'static str| {
+        let file_name = file_name.unwrap_or(&String::default()).to_owned();
         GetTagsError::new(
-            file_name.unwrap_or(&"test".to_string()).to_owned(),
-            format!("{} {}", message_format, process),
+            ErrorKind::IoError,
+            format!("{} {} for file {}", message_format, process, file_name),
         )
     };
 
@@ -39,8 +40,8 @@ pub fn from(file_path: &impl AsRef<Path>) -> Result<Box<dyn Tags>, GetTagsError>
         ".mp3" => Ok(Box::new(MP3Tags {})),
         ".m4a" => Ok(Box::new(MP4Tags {})),
         _ => Err(GetTagsError::new(
-            file_name,
-            format!("Unsupported file type: {}", extension),
+            ErrorKind::InvalidFileExtension,
+            format!("Unsupported file extension: {}", extension),
         )),
     }
 }
