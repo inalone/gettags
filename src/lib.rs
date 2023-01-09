@@ -9,13 +9,13 @@ pub use traits::*;
 use std::{ffi::OsStr, path::Path};
 
 // TODO: possibly better way of doing this
-fn string_from_os_str(
+fn string_from_os_str<'a>(
     os_str: Option<&OsStr>,
     process: &'static str,
-    file_name: Option<&String>,
+    file_name: Option<&'a str>,
 ) -> Result<String, GetTagsError> {
     let generate_error = |message_format: &'static str| {
-        let file_name = file_name.unwrap_or(&String::default()).to_owned();
+        let file_name = file_name.unwrap_or("").to_string();
         GetTagsError::new(
             ErrorKind::IoError,
             format!("{} {} for file {}", message_format, process, file_name),
