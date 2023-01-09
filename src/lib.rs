@@ -11,21 +11,25 @@ use std::{ffi::OsStr, path::Path};
 // TODO: possibly better way of doing this
 fn string_from_os_str<'a>(
     os_str: Option<&OsStr>,
-    process: &'static str,
+    context: &'static str,
     file_name: Option<&'a str>,
 ) -> Result<String, GetTagsError> {
-    let generate_error = |message_format: &'static str| {
-        let file_name = file_name.unwrap_or("").to_string();
+    let raise_error = |message_format: &'static str| {
         GetTagsError::new(
             ErrorKind::IoError,
-            format!("{} {} for file {}", message_format, process, file_name),
+            format!(
+                "{} {} for file {}",
+                message_format,
+                context,
+                file_name.unwrap_or("")
+            ),
         )
     };
 
     Ok(os_str
-        .ok_or_else(|| generate_error("Could not retrieve"))?
+        .ok_or_else(|| raise_error("Could not retrieve"))?
         .to_str()
-        .ok_or_else(|| generate_error("Could not parse"))?
+        .ok_or_else(|| raise_error("Could not parse"))?
         .to_string())
 }
 
