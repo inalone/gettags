@@ -33,19 +33,19 @@ fn string_from_os_str<'a>(
         .to_string())
 }
 
-pub fn from(file_path: &impl AsRef<Path>) -> Result<Box<dyn Tags>, GetTagsError> {
+pub fn from(file_path: &impl AsRef<Path>) -> Result<BoxedTags, GetTagsError> {
     let file_path = file_path.as_ref();
     let file_name = string_from_os_str(Some(file_path.as_os_str()), "file path string", None)?;
     let file_contents = std::fs::read(file_path)?;
 
     let extension = string_from_os_str(file_path.extension(), "file extension", Some(&file_name))?;
-    match extension.as_str() {
-        ".flac" => Ok(Box::new(FlacTags {})),
-        ".mp3" => Ok(Box::new(MP3Tags {})),
-        ".m4a" => Ok(Box::new(MP4Tags {})),
+    Ok(match extension.as_str() {
+        ".flac" => FlacTags::new().from_buffer(&file_contents),
+        ".mp3" => MP3Tags::new().from_buffer(&file_contents),
+        ".m4a" => MP4Tags::new().from_buffer(&file_contents),
         _ => Err(GetTagsError::new(
             ErrorKind::InvalidFileExtension,
             format!("Unsupported file extension: {}", extension),
-        )),
-    }
+        ))?,
+    })
 }
